@@ -17,4 +17,6 @@
 #ilovejson 's are from super_old_data
 
 data/new_method
-data/polarizability_data
+data/polarizability_data/*
+!data/polarizability_data/orca_runs/
+!data/polarizability_data/orca_runs/*
