@@ -1,0 +1,5 @@
+! B3LYP DEF2-SVP TightSCF
+%elprop
+Polar 1
+end
+* xyzfile 0 1 _196.xyz
