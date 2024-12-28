@@ -1,2 +1,4 @@
 *
-!data/images
+!data/
+!data/images/
+!data/images/**
