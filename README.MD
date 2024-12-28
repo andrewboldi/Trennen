@@ -1,0 +1,129 @@
+# Trennen
+
+Trennen is German for separate
+
+- [ ]  Use machine learning to find out if we can do a good job predicting the angle of optical activity for a given enantiomer.
+    - [ ]  Determine factors which affect optical activity.
+    - [ ]  
+- [ ]  Use machine learning to predict the EE% of a reaction
+    - [ ]  Determine factors of enantioselectivity.
+    - [ ]  
+
+Input: solvent, reactants, and catalysts as positions in 3d space
+
+Output: EE%
+
+## What I did:
+- First, I downloaded the QM9 dataset.
+- This includes about 130K different organic molecules with their xyz coordinates, smiles, and inchi.
+- That's cool.
+- But some of these organic molecules in their SMILES form did not have any stereochemistry.
+- We need molecules with stereochemistry because all planar molecules (2d molecules) can be flipped in 3d space to undo a reflection.
+- Generally speaking, a n dimensional figure is achiral in n+1 dimensions (I postulate).
+- However, an achiral molecule in n+1 dimensions is not necessary to make it chiral in n dimensions.
+- We need stereochemistry in optical activity so I simply added all files with stereochemistry as follows `find . -type f -exec grep -F '@' {} \; -exec mv -t files\_with\_stereochemistry/ {} + `.
+- This is because the SMILES format uses the `@` symbol to denote stereochemistry.
+- OK.
+- That's cool.
+- But we don't know if all of these molecules have chiral centers.
+- Remember, our goal is to filter all these molecules to just be enantiomers.
+- To find the chiral centers and filter them into a new directory, we can use the RDkit python chemistry tooling library.
+- So I wrote a simple python script titled "find\_files\_with\_chiral\_centers.py".
+- After executing it (took about 20 minuteS), we have a new directory with ~97K molecules which contain chiral centers.
+- OK.
+- That's cool.
+- But we need only molecules which are chiral.
+- As a sidenote, I do know that diasteoremers are sometimes optically active but for the purpose of this project, we are considering only enantiomers.
+- At that time of doing this project, I was learning group theory and how I might possibly determine if a molecule is chiral or not.
+- I had checked many places online but I couldn't really find a definitive explanation.
+- However, I had received a reply from ChirBase allowing me to sample their database which contained about 13K chiral compounds (the full database contains over 300K compounds).
+- So I ran with the idea and began by exporting the database as an excel worksheet in the smiles format (thankfully the isomeric smiles was included).
+- I then removed the excess junk and create a single txt file with all the smiles compounds in a directory called chirbase\_chiral\_molecules named "CHIRBASE\_SEPARATION.txt" (not included).
+- However, this contained duplicate smiles in the list because it had different information based on the researcher.
+- Therefore, a simple script was written to remove all the duplicates named "remove\_duplicate\_entries.py". 
+- After running it, the new file was named "CHIRBASE\_SEPARATION\_UPDATED.txt". 
+- Now, the final step in setting up the data was to retrieve the optical activity for each of the chiral compounds.
+- To do this, I broke it up in two steps.
+- First, we would retrieve and determine if the compound exists on Chemsp\*\*\*r. 
+- Since Chemsp\*\*\*r redirects their links immediately to the coumpound if it is found, a simple script was written to automatically determine the redirect link and retrieve it into a file named "get\_chemsp\*\*\*r\_links.py". 
+- This script took about 12 hours to execute since there was a 1 second delay included in the script to prevent overloading the chemsp\*\*\*r servers as well as to prevent the chemsp\*\*\*r overlords banning my IP :)
+- OK.
+- That's cool.
+- We have a list of all the links to chiral compounds with their respective chiral molecules. 
+- By the way, the actual links file was cleaned up to remove the "no redirects" and links which did not get sent to an actual molecule name.
+- In total, we have 6K chiral compounds which has a valid chemsp\*\*\*r link.
+- For those interested, the commands in vim were `:%s/^no redirect\n//g` followed by `:%s/^.*@.*$\n//g` followed by `:%s/^.*C\/.*\n//g` followed by `:%s/^.*C(.*\n//g` followed by `:%s/^.*C=.*\n//g` followed by `%:^s/^.*=O.*\n//g` followed by `:%s/?rid.*$//g` followed by `:%s/b'//g`.
+- WAIT
+- I just shot myself in the foot.
+- I executed all the find and replace and removed all the "no redirects" but now I don't know the smiles format for the structures. 
+- RIP.
+- I guess I have to run this again to determine exact smiles structures . . . 
+- Next time, I should just leave a blank line or a line with a specific character (such as #) to specify that it is a placeholder for an invalid link.
+- However, we can run this again in conjunction with part 2 which is to actually retrieve the optical rotation direction.
+- This can simply be done by extracting the title page or synonym of the respective chemsp\*\*\*r link since it is included in the molecules name.
+- To do this, get\_chemspider\_link.py was completely rewritten.
+- The end result should be that the CHIRBASE\_SEPARATION\_LINKS.txt should be in sync with the CHIRBASE\_SEPARATION\_UPDATED.txt such that the smiles and links correspond if a valid molecule exists. 
+- Additionally, the CHIRBASE\_SEPARATION\_DIRECTION.txt file should include a list of arrays with the respective smile, url, and optical direction.
+- As I am working on this file, I just realized that we don't even need the chirbase database. We just need a large set of molecules and simply check if it contains the (-) or (+) indicator in the title to determine its chirality.
+- Since this script checks the redirect link as well as retrieving the link, the script took about [blank] hours to execute.
+- After all of this, we finally had a list of chiral molecules with their optical rotation direction.
+- Depending on how much data we are able to extract form these molecules, we have two options.
+- If we have a lot of data (relatively), we will begin writing on our machine learning model.
+- If we do not have a lot of data, we should ideally find a larger dataset with more organic molecules and run all of the above steps again.
+- In either case, we have one more necessary step for our data science part.
+- We need to artifically generate the stereoisomer of each molecule if it is not present.
+- And after considering this, I believe it would make the most sense to generate these molecules before running the above script and check them on chemspider.
+- This is because I don't see a trivial way of generating the chiral enantiomers with multiple chiral centers. 
+- Furthermore, it appears that some data in the "chirbase" database does not contain only chiral molecules.
+- For example, dichloromethane appears in the data . . .
+- Also, it appears that the chirbase database is too small.
+- So . . . we are going to transition our work to the 
+- OK.
+- So first I moved all the files in files\_With\_chiral\_centers into a subdirectory named files.
+- Then I copied the files/ directory into files\_with\_optical\_rotation directory.
+- Then I began working on the script in the directory.
+- It seems like that it would be easier to first create a giant file with the list of smiles as well as their stereoisomers to be searched in chemsp\*\*\*r.
+- OK.
+- LET's DO THIS
+- BRUH
+- ok
+- Just like undo the past 50 lines or something.
+- I was reading something online from Jun 2000!
+- And they said you could just simply reflect the mol file across the origin to get the enantiomer.
+- So yeah.
+- From that we have determine the chirality of a molecule.
+- So I basically wrote two functions and made a pull request with rdkit.
+- So yeah lol.
+- We're just going to use the QM9 dataset (isomeric smiles format) and filter out only chiral molecules. 
+- Then we'll generate the enantiomers and write a smart function to figure out if an enantiomer is missing on chemsp\*\*\*r to use the opposite direction of the other enantiomer.
+- OK, just generated all the enantiomers of molecules with chirality in the QM9 dataset.
+- This means we have a big list of chiral molecules (enantiomers)!!!
+- Took about 60 minutes to execute (find\_files\_with\_chirality.py).
+- UPDATE: Seems like there is going to be a lot of enantiomers!! At 27%, we already had 40K enantiomers! More Data = Better chances at beating MIT
+- Now, we just get the relevant optical rotation value from chemsp\*\*\*r.
+- Fortunately, we already wrote a script to do that!
+- Ok so after not working on this for two weeks, here is my progress: All is vanity. Everything in the useless/data/ folder is vanity. Waste of time. Completely.
+- At least I learned a lot though. Even got a PR on rdkit. Anyways. . . 
+- So basically chemsp\*\*\*er is pretty bad since (1) its slow (2) IT GAVE LIKE 100 OPTICAL ROTATION VALUES AFTER RUNNING IT FOR OVER 9000 compounds.
+- That's like a 1% extraction rate and we'll never be able to compete with the 70K molecules ChiRO used.
+- We're going to use pubchem.
+- And after searching, I came across this article: https://www.ncbi.nlm.nih.gov/Class/PubChem/essentials/limits.html
+- Basically, you can obtain all compounds in the pubchem database by their chirality and . . . now we have a dataset of ~17 million chiral compounds (YOO).
+- By choosing the export type as the synonyms, we can simply search for molecules with the (+) or (-) synonym and extract the CID number. Then, we use the CID number to obtain the isomeric smiles/mol file.
+- Let's go.
+- GG.
+- Ok so apparently there was a download fail and it only downloaded 4 million compounds out of the possible 18 million compounds.
+- But.... good news
+- On our computer now (4million.txt), we have approximately 15 thousand compounds labeled with their (-) or (+) indicator, without artifically generating the enantiomer.
+- Not bad.
+- We'll retry the download to see if we can get all 18 million compounds.
+- Alright, so I made a video essentially explaining what I did.
+- The download was incredibly slow and a terrible process.
+- So I used the esearch api to repeat the search I did on the ncbi site and got all the CIDs in the CIDs.txt file.
+- Then I PUGrest to retrieve all the synonyms of the CIDs.
+- Since doing individual ones was slow, I wrote a function pubchem.py which essentially sends a post request with a bunch of CIDs separated by commas.
+- Then, I retrieved the smiles and placed them in a file.
+- After some ReGeX magic, we got to the files ilovesmiles.txt and ilovejson.txt.
+- 
+- Note that the data in ilovedata.txt is NOT all chiral since it also includes compounds with lines such as (CH+).
+- The generate\_enantiomers.py script sorts these compounds and creates a new file with enantiomers and only chiral compounds.

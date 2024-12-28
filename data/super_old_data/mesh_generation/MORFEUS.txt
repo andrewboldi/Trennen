@@ -1,0 +1,5 @@
+from morfeus import *
+import numpy as np
+elements, coordinates = read_xyz("../xyz/" + str(4270) + ".xyz")
+sasa = SASA(elements, coordinates)
+sasa.draw_3D(4270)

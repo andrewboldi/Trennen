@@ -1,0 +1,20 @@
+
+#!data/
+#!data/images/
+#!data/images/**
+#!data/smiles/
+#!data/smiles/**
+#!data/semi_old_data/
+#!data/semi_old_data/**
+#data/ilovesmiles.txt
+#!data/*.py
+#!data/inchi_rot/
+#!data/inchi_rot/**
+
+#ilovesmiles is from data
+#4million is from super_old_data
+#original is from super_old_data
+#ilovejson 's are from super_old_data
+
+data/new_method
+data/polarizability_data

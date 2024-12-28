@@ -1,0 +1,41 @@
+from pprint import pprint
+from tqdm import tqdm
+import ast
+import fileinput
+
+class Data:
+    def __init__(self, cid: list, smiles: list):
+        for i, x in enumerate(cid):
+            dataname = "s" + "".join(x)
+            self.dataname = list(smiles[i].values())[0]
+
+jarr = fileinput.input(["ilovejson.txt"])
+print("valued jarr")
+sarr = fileinput.input(["ilovesmiles.txt"])
+print("valued sarr")
+# smilecid = list(ast.literal_eval(x).keys() for x in sarr)
+list1 = [list(x[x.index("\": ") + 4: -2]) for x in sarr]
+print("done with list 1")
+list2 = [list(x[2: x.index("\":")]) for x in sarr]
+print("done with list 2")
+Smiles = Data(list1, list2)
+# smiles = list(ast.literal_eval(x).values() for x in sarr)
+print("parsed values")
+out = open("ilovedata.json", "a")
+exit(0)
+
+for i, d in tqdm(enumerate(jarr)):
+    d = ast.literal_eval(d)
+    for synonym in list(d.values())[0]:
+        if "(+)" in synonym:
+            out.write(f"{smiles[smilecid.index(list(d.keys())[0])]}: (+)\n") # FIX GARBAGE
+            break
+        elif "(-)" in synonym:
+            out.write(f"{smiles[smilecid.index(list(d.keys())[0])]}: (-)\n")
+            out.write(d)
+            break
+        else:
+            pass
+
+out.close()
+jarr.close()

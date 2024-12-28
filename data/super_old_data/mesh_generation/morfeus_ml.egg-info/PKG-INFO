@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: morfeus-ml
+Version: 0.5.5
+Summary: A Python package for calculating molecular features
+Home-page: UNKNOWN
+Author: Kjell Jorner
+Author-email: kjell.jorner@gmail.com
+License: MIT
+Description: A Python package for calculating molecular features. For more information, see the [project repository](https://github.com/kjelljorner/morfeus).
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
