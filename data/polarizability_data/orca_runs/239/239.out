@@ -1,0 +1,3 @@
+The following are not valid: 239.inp
+Another screen reader process is already running for this session.
+Run “orca --replace” to replace that process with a new one.
