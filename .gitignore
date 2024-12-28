@@ -2,3 +2,9 @@
 !data/
 !data/images/
 !data/images/**
+!data/smiles/
+!data/smiles/**
+!data/semi_old_data/
+!data/semi_old_data/**
+data/ilovesmiles.txt
+!data/*.py
